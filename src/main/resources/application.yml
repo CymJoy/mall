@@ -1,0 +1,48 @@
+server:
+  port: 8080
+  url: http://0.0.0.0
+security:
+  enable-csrf: false
+spring:
+#  profiles: localhost
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mmj?useUnicode=true&characterEncoding=UTF-8
+    initialize: true
+    # Number of ms to wait before throwing an exception if no connection is available.
+    max-wait: 15000
+    # Maximum number of active connections that can be allocated from this pool at the same time.
+    max-active: 50
+    # Validate the connection before borrowing it from the pool.
+    test-on-borrow: true
+    validation-query: select 1
+    username: root
+    password:
+
+# mybatis 插件
+mybatis-plus:
+  typeAliasesPackage: com.neusoft.mall.*
+  mapper-locations: classpath:/mysql-mappers/*DAO.xml
+  global-config:
+    #主键类型  0:"数据库ID自增", 1:"用户输入ID",2:"全局唯一ID (数字类型唯一ID)", 3:"全局唯一ID UUID";
+    id-type: 3
+    #字段策略 0:"忽略判断",1:"非 NULL 判断"),2:"非空判断"
+    field-strategy: 2
+    #驼峰下划线转换
+    db-column-underline: true
+    #刷新mapper 调试神器
+    refresh-mapper: true
+    #数据库大写下划线转换
+    #capital-mode: true
+    #序列接口实现类配置
+    #key-generator: com.baomidou.springboot.xxx
+    #逻辑删除配置
+    #logic-delete-value: 0
+    #logic-not-delete-value: 1
+    #自定义填充策略接口实现
+    #meta-object-handler: com.baomidou.springboot.xxx
+    #自定义SQL注入器
+    #sql-injector: com.baomidou.springboot.xxx
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: true
