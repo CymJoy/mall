@@ -51,16 +51,4 @@ public class Commodity extends BaseDO {
      */
     private Date updateTime;
 
-    @Override
-    public String toString() {
-        return "Commodity{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", integraldonation=" + integral +
-                ", counts=" + counts +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
-    }
 }
