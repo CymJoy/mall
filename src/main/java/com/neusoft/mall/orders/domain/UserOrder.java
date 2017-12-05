@@ -22,6 +22,11 @@ public class UserOrder extends BaseDO {
     private String id;
 
     /**
+     * 商品id
+     */
+    private String commodityId;
+
+    /**
      * 订单号码,格式:LOC+时间+当前时间毫秒数后四位
      */
     private String orderNumber;
