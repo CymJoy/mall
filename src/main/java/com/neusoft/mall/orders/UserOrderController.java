@@ -63,7 +63,7 @@ public class UserOrderController {
      * @param newStatus
      * @return
      */
-    @PostMapping(value = "/{userId}/order")
+//    @PostMapping(value = "/{userId}/order")
     public ResponseEntity<Result<UserOrderDTO>> updateStatus(@PathVariable("oldStatus") Integer oldStatus, @PathVariable("newStatus") Integer newStatus, @RequestBody UserOrderDTO userOrderDto) {
         if (ObjectUtils.isEmpty(userOrderDto)) {
             throw new RestBadRequestException(ExceptionEnumeration.CommonBadRequest);
@@ -97,7 +97,7 @@ public class UserOrderController {
      * @param commodityId
      * @return
      */
-    @PostMapping(value = "/{userId}/order")
+//    @PostMapping(value = "/{userId}/order")
     public ResponseEntity<Result<UserOrderDTO>> updateCounts(@PathVariable("status") Integer status, @PathVariable("counts") Integer counts, @PathVariable("commodityId") String commodityId) {
         if (ObjectUtils.isEmpty(commodityId)) {
             throw new RestBadRequestException(ExceptionEnumeration.CommonBadRequest);

@@ -51,4 +51,6 @@ public class Commodity extends BaseDO {
      */
     private Date updateTime;
 
+    private Integer type;
+
 }

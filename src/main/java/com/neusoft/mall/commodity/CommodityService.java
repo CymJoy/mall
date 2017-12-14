@@ -1,16 +1,16 @@
 package com.neusoft.mall.commodity;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.neusoft.mall.commodity.domain.Commodity;
 import com.neusoft.mall.common.base.BaseService;
 import com.neusoft.mall.domain.PageResponse;
 import com.neusoft.mall.exception.ExceptionEnumeration;
 import com.neusoft.mall.exception.common.RestBadRequestException;
+import com.neusoft.mall.utils.VerifyUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -21,8 +21,14 @@ import java.util.List;
 @Service
 public class CommodityService implements BaseService<Commodity, String> {
 
-    @Resource
+    @Autowired
     private CommodityDAO commodityDAO;
+
+    @Override
+    public Commodity add(Commodity obj) {
+        this.commodityDAO.insert(obj);
+        return obj;
+    }
 
     /**
      * 返回指定id商品详情
@@ -31,8 +37,16 @@ public class CommodityService implements BaseService<Commodity, String> {
      * @return
      */
     public Commodity findCommodityById(String id) {
-
         return this.commodityDAO.selectById(id);
+    }
+
+    public List<Commodity> findByType(int type){
+        List<Commodity> list = this.commodityDAO.selectList(new EntityWrapper<Commodity>().eq("type",type));
+        if (VerifyUtil.isLengthEquals_0(list)){
+
+            return list;
+        }
+        return null;
     }
 
     public PageResponse<Commodity> findAllCommodity(String commodityId) {

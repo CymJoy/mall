@@ -66,4 +66,9 @@ public class User {
 
     private Date updateTime;
 
+    /**
+     * 用户手机号码
+     */
+    private String phoneNumber;
+
 }

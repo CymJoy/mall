@@ -1,6 +1,7 @@
 package com.neusoft.mall.address;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.neusoft.mall.address.domain.Address;
 import com.neusoft.mall.enums.CommonStatusEnum;
 import com.neusoft.mall.exception.ExceptionEnumeration;

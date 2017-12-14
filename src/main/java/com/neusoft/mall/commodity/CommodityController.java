@@ -3,6 +3,7 @@ package com.neusoft.mall.commodity;
 import com.neusoft.mall.commodity.domain.Commodity;
 import com.neusoft.mall.common.base.BaseController;
 import com.neusoft.mall.common.config.RouteConstants;
+import com.neusoft.mall.domain.PageRequest;
 import com.neusoft.mall.domain.PageResponse;
 import com.neusoft.mall.exception.ExceptionEnumeration;
 import com.neusoft.mall.exception.common.RestBadRequestException;
@@ -47,13 +48,28 @@ public class CommodityController implements BaseController<Commodity, String> {
     }
 
     /**
+     * 根据type查询商品
+     *
+     * @param type
+     * @return
+     */
+    @GetMapping
+    public ResponseEntity<Result<List<Commodity>>> findCommodityByType(int type) {
+        if (ObjectUtils.isEmpty(type)) {
+            throw new RestBadRequestException(ExceptionEnumeration.CommonBadRequest);
+        }
+        List<Commodity> commodity = this.commodityService.findByType(type);
+        return new ResponseEntity(ResultUtil.success(commodity), HttpStatus.OK);
+    }
+
+    /**
      * 查询所有商品详情
      *
      *
      * @return
      */
-
-    public ResponseEntity<Result<Commodity>> findAllCommodity(int pages,int page,int size,String commodityId) {
+//    @GetMapping
+    public ResponseEntity<Result<Commodity>> findAllCommodity(PageRequest pageRequest, String commodityId) {
         PageResponse<Commodity> commodity = this.commodityService.findAllCommodity(commodityId);
         if (VerifyUtil.isEmpty(commodity)) {
             throw new RestBadRequestException(ExceptionEnumeration.CommonEmptyResult);

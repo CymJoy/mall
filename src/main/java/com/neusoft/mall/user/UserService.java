@@ -22,6 +22,21 @@ import java.util.Date;
 @Service
 public class UserService extends MybatisPlusServiceImpl<UserDAO, User> {
 
+    public boolean register(User user) {
+        User isExisted = new User();
+        isExisted.setPhoneNumber(user.getPhoneNumber());
+        EntityWrapper<User> entityWrapper = new EntityWrapper();
+        entityWrapper.setEntity(isExisted);
+        if (VerifyUtil.isNotEmpty(this.selectOne(entityWrapper))){
+            throw new RestBadRequestException(ExceptionEnumeration.UserAccountNumberIsExisted);
+        }
+        user.setType(UserTypeEnum.GeneralUser.getValue());
+        user.setCreateTime(new Date());
+        super.insertAllColumn(user);
+        return true;
+    }
+
+
     /**
      * 註冊新用戶
      * @param dto
