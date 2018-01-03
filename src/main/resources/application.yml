@@ -7,7 +7,9 @@ spring:
 #  profiles: localhost
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
+    #url: jdbc:mysql://localhost:3306/mall?useUnicode=true&characterEncoding=UTF-8
     url: jdbc:mysql://localhost:3306/mmj?useUnicode=true&characterEncoding=UTF-8
+
     initialize: true
     # Number of ms to wait before throwing an exception if no connection is available.
     max-wait: 15000
@@ -17,7 +19,7 @@ spring:
     test-on-borrow: true
     validation-query: select 1
     username: root
-    password:
+    password: 123456
 
 # mybatis 插件
 mybatis-plus:

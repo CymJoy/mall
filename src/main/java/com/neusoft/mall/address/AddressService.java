@@ -1,7 +1,6 @@
 package com.neusoft.mall.address;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.neusoft.mall.address.domain.Address;
 import com.neusoft.mall.enums.CommonStatusEnum;
 import com.neusoft.mall.exception.ExceptionEnumeration;
@@ -73,7 +72,7 @@ public class AddressService {
             throw new RestBadRequestException(ExceptionEnumeration.ShippingAddressIsDeleted);
         } else {
             address.setStatus(CommonStatusEnum.DELETE.getValue());
-            this.addressDAO.updateById(address);
+            this.addressDAO.deleteById(address);
             return true;
         }
     }

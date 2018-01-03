@@ -26,6 +26,7 @@ public class UserOrderService extends MybatisPlusServiceImpl<OrderDAO, UserOrder
 
     @Autowired
     private OrderDAO orderDao;
+    @Autowired
     private CommodityDAO commodityDAO;
 
 
