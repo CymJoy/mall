@@ -7,13 +7,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.Assert.*;
 
-/**
- * Created by chenyingmiao on 2017/12/6.
- */
 @RunWith(SpringRunner.class)
 @SpringBootTest
 //@Transactional
@@ -34,6 +29,25 @@ public class CommodityServiceTest {
         commodity.setName("母婴萌宝");
         commodity.setType(1);
         this.commodityService.add(commodity);
+    }
+
+    @Test
+    public void delete() throws Exception {
+        this.commodityService.removeById("1");
+    }
+
+    @Test
+    public void updateById() throws Exception {
+        Commodity commodity = this.commodityService.findCommodityById("1");
+        System.out.println(commodity.getCounts()+commodity.getId()+"---------------");
+        commodity.setCounts(10000);
+        System.out.println("==========="+this.commodityService.updateById(commodity));
+    }
+
+    @Test
+    public void select() throws Exception {
+        Commodity commodity = this.commodityService.findCommodityById("1");
+        System.out.print(commodity.getId()+commodity.getName()+"-----------------");
     }
 
 }

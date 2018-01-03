@@ -30,6 +30,16 @@ public class CommodityService implements BaseService<Commodity, String> {
         return obj;
     }
 
+
+    public boolean updateById(Commodity obj) {
+        Integer i = this.commodityDAO.updateById(obj);
+        if (i > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * 返回指定id商品详情
      *
@@ -40,9 +50,9 @@ public class CommodityService implements BaseService<Commodity, String> {
         return this.commodityDAO.selectById(id);
     }
 
-    public List<Commodity> findByType(int type){
-        List<Commodity> list = this.commodityDAO.selectList(new EntityWrapper<Commodity>().eq("type",type));
-        if (VerifyUtil.isLengthEquals_0(list)){
+    public List<Commodity> findByType(int type) {
+        List<Commodity> list = this.commodityDAO.selectList(new EntityWrapper<Commodity>().eq("type", type));
+        if (VerifyUtil.isLengthEquals_0(list)) {
 
             return list;
         }
@@ -52,8 +62,8 @@ public class CommodityService implements BaseService<Commodity, String> {
     public PageResponse<Commodity> findAllCommodity(String commodityId) {
         Commodity commodity = this.commodityDAO.selectById(commodityId);
         EntityWrapper<Commodity> entityWrapper = new EntityWrapper<Commodity>();
-        if(ObjectUtils.isEmpty(this.commodityDAO.select())){
-          throw new RestBadRequestException(ExceptionEnumeration.CommodityIsNotFound);
+        if (ObjectUtils.isEmpty(this.commodityDAO.select())) {
+            throw new RestBadRequestException(ExceptionEnumeration.CommodityIsNotFound);
         }
         PageResponse<Commodity> pageResponse = new PageResponse<Commodity>();
         pageResponse.setList(this.commodityDAO.select());
