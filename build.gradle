@@ -32,6 +32,7 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-aop')
 	compile('org.springframework.boot:spring-boot-starter-jdbc')
 	compile('org.springframework.boot:spring-boot-starter-web')
+	compile('org.springframework.boot:spring-boot-starter-test')
 	//runtime('mysql:mysql-connector-java')
 
 	//mysql
@@ -50,5 +51,7 @@ dependencies {
 	// page help
 	compile group: 'com.github.pagehelper', name: 'pagehelper-spring-boot-starter', version: '1.1.0'
 
-	testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.springframework.boot', module: 'spring-boot-starter'
+	}
 }

@@ -16,7 +16,7 @@ import javax.validation.Valid;
 @RequestMapping(RouteConstants.PREFIX + "/users")
 public interface UserController {
 
-//    @PostMapping
+    @PostMapping
     ResponseEntity create(@RequestBody @Valid CreateUserDTO dto, BindingResult bindingResult);
 
     @GetMapping

@@ -11,10 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 /**
  * Created by chenyingmiao on 2017/11/5.
@@ -30,7 +29,8 @@ public class UserControllerImpl implements UserController{
         return "hello,this is a springboot demo";
     }
 
-    @PostMapping
+//    @PostMapping
+    @Deprecated
     public ResponseEntity<Result<Object>> create(@RequestBody User user) {
         if (VerifyUtil.isEmpty(user.getPhoneNumber())){
             throw new RestBadRequestException("手机号码不能为空");
@@ -40,7 +40,7 @@ public class UserControllerImpl implements UserController{
     }
 
     @Override
-    public ResponseEntity<Result<Object>> create(CreateUserDTO dto, BindingResult bindingResult) {
+    public ResponseEntity<Result<Object>> create(@RequestBody @Valid CreateUserDTO dto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
             throw new RestBadRequestException(ExceptionEnumeration.CommonCustomError,bindingResult.getFieldError().getDefaultMessage());
         }
@@ -49,7 +49,7 @@ public class UserControllerImpl implements UserController{
     }
 
     @Override
-    public ResponseEntity<Result<User>> findByParam(FindUserDTO dto, BindingResult bindingResult) {
+    public ResponseEntity<Result<User>> findByParam(@ModelAttribute @Valid FindUserDTO dto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()){
             throw new RestBadRequestException(ExceptionEnumeration.CommonCustomError,bindingResult.getFieldError().getDefaultMessage());
         }
