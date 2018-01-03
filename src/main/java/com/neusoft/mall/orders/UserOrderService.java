@@ -4,14 +4,19 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.neusoft.mall.commodity.CommodityDAO;
 import com.neusoft.mall.commodity.domain.Commodity;
 import com.neusoft.mall.common.MybatisPlusServiceImpl;
+import com.neusoft.mall.domain.PageRequest;
 import com.neusoft.mall.domain.PageResponse;
 import com.neusoft.mall.enums.OrderStatusEnum;
 import com.neusoft.mall.exception.ExceptionEnumeration;
 import com.neusoft.mall.exception.common.RestBadRequestException;
 import com.neusoft.mall.orders.domain.UserOrder;
+import com.neusoft.mall.user.User;
+import com.neusoft.mall.user.UserDAO;
 import com.neusoft.mall.utils.VerifyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.text.SimpleDateFormat;
@@ -26,9 +31,12 @@ public class UserOrderService extends MybatisPlusServiceImpl<OrderDAO, UserOrder
 
     @Autowired
     private OrderDAO orderDao;
+
     @Autowired
     private CommodityDAO commodityDAO;
 
+    @Autowired
+    private UserDAO userDAO;
 
     /**
      * 取消订单
@@ -45,16 +53,12 @@ public class UserOrderService extends MybatisPlusServiceImpl<OrderDAO, UserOrder
 
         EntityWrapper<UserOrder> entityOrderWrapper = new EntityWrapper();
         entityOrderWrapper.setEntity(isOrderExisted);
-        if (VerifyUtil.isNotEmpty(this.selectOne(entityOrderWrapper))){
+        if (VerifyUtil.isEmpty(this.selectOne(entityOrderWrapper))) {
             throw new RestBadRequestException(ExceptionEnumeration.OrderIsNotFound);
         }
         //如果订单存在则设置状态为0，即已取消状态；
-        isOrderExisted.setStatus(0);
-        int number = this.orderDao.updateById(isOrderExisted);
-        if(number>0){
-            throw new RestBadRequestException(ExceptionEnumeration.OrderUpdateFailed);
-        }
-
+        isOrderExisted.setStatus(OrderStatusEnum.Cancelled.getValue());
+        this.orderDao.updateById(isOrderExisted);
     }
 
     /**
@@ -63,49 +67,54 @@ public class UserOrderService extends MybatisPlusServiceImpl<OrderDAO, UserOrder
      * @param userOrderDTO
      * @return
      */
+    @Transactional
     public synchronized boolean createUserOrder(UserOrderDTO userOrderDTO) {
-
-        SimpleDateFormat simple = new SimpleDateFormat("yyyyMMddHHssmmSSSS");
-        String currentTime = simple.format(new Date());
-        if(!(userOrderDTO.getCommodityCounts()>0)){
-            throw new RestBadRequestException(ExceptionEnumeration.CommodityInventoryNotEnough);
+        User user = userDAO.selectById(userOrderDTO.getUserId());
+        if (VerifyUtil.isEmpty(user)) {
+            throw new RestBadRequestException(ExceptionEnumeration.UserIsNotFound);
+        }
+        Commodity commodity = commodityDAO.selectById(userOrderDTO.getCommodityId());
+        if (VerifyUtil.isEmpty(commodity)) {
+            throw new RestBadRequestException(ExceptionEnumeration.CommodityIsNotFound);
         }
         UserOrder order = UserOrderDTO.copy(userOrderDTO);
         order.setCreateTime(new Date());
-        order.setStatus(1);
-        order.setCommodityCounts(userOrderDTO.getCommodityCounts()-1);
+        order.setStatus(OrderStatusEnum.UnShipped.getValue());
         //设置订单号
-        order.setOrderNumber("LOC"+currentTime);
+        String currentTime = String.valueOf(System.currentTimeMillis());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+        String dateNowStr = sdf.format(new Date());
+        order.setOrderNumber("LOC" + dateNowStr + currentTime.substring(currentTime.length() - 4));
         //调用插入订单的方法
         this.orderDao.insertAllColumn(order);
+        //订单创建成功，更新商品
+        Commodity updateCommodity = updateCounts(order.getStatus(), userOrderDTO.getCommodityCounts(), userOrderDTO.getCommodityId());
+        if (VerifyUtil.isEmpty(updateCommodity)){
+            return false;
+        }
         return true;
-
     }
 
     /**
-     * 更新订单状态
+     * 更新订单
      *
-     * @param userOrderDTO
-     * @param oldStatus 原状态
-     * @param newStatus 新状态
+     * @param updateUserOrderDTO
      * @return
      */
-    public boolean updateStatus(UserOrderDTO userOrderDTO, int oldStatus, int newStatus) {
-
-        UserOrder order = UserOrderDTO.copy(userOrderDTO);
-        order.setStatus(oldStatus);
-        EntityWrapper<UserOrder> entityWrapper = new EntityWrapper<UserOrder>();
-        entityWrapper.setEntity(order);
-        if (VerifyUtil.isEmpty(this.orderDao.selectById(entityWrapper))){
+    public boolean updateStatus(UpdateUserOrderDTO updateUserOrderDTO) {
+        UserOrder order = new UserOrder();
+        order.setUserId(updateUserOrderDTO.getUserId());
+        order.setId(updateUserOrderDTO.getOrderId());
+        UserOrder isExistedOrder = orderDao.selectOne(order);
+        if (VerifyUtil.isEmpty(isExistedOrder)){
             throw new RestBadRequestException(ExceptionEnumeration.OrderIsNotFound);
         }
-        order.setStatus(newStatus);
-        order.setUpdateTime(new Date());
-        this.updateAllColumnById(order);
+        UserOrder userOrder = updateUserOrderDTO.copy(updateUserOrderDTO);
+        isExistedOrder.setUpdateTime(new Date());
+        isExistedOrder.setStatus(userOrder.getStatus());
+        this.updateAllColumnById(isExistedOrder);
         return true;
-
     }
-
 
 
     /**
@@ -143,23 +152,18 @@ public class UserOrderService extends MybatisPlusServiceImpl<OrderDAO, UserOrder
     }
 
     /**
-     * 查询所有订单
-     *
-     *
+     * 查询用户所有订单
      *
      * @param userId 用户id
      * @return
      */
-    public PageResponse<UserOrder> findAllOrder(String userId) {
-        List<UserOrder> list = this.orderDao.select();
-        UserOrder order = new UserOrder();
-        EntityWrapper<UserOrder> entity = new EntityWrapper<UserOrder>(order);
-        if(ObjectUtils.isEmpty(list)){
-            throw  new RestBadRequestException(ExceptionEnumeration.OrderIsNotFound);
+    public PageResponse<UserOrder> findAllUserOrder(PageRequest pageRequest , String userId) {
+        if (VerifyUtil.isEmpty(userDAO.selectById(userId))){
+            throw new RestBadRequestException(ExceptionEnumeration.UserIsNotFound);
         }
-        PageResponse<UserOrder> pageResponse = new PageResponse<UserOrder>();
-        pageResponse.setTotal(this.orderDao.selectCount(entity));
-        pageResponse.setList(list);
+        EntityWrapper<UserOrder> wrapper = new EntityWrapper<>();
+        wrapper.eq("user_id",userId);
+       PageResponse<UserOrder> pageResponse =  this.selectPage(pageRequest, wrapper);
         return pageResponse;
     }
 }

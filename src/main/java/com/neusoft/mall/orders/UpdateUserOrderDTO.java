@@ -12,7 +12,7 @@ import org.springframework.beans.BeanUtils;
  * @author chenyingmiao
  */
 @Data
-public class UserOrderDTO extends BaseDTO{
+public class UpdateUserOrderDTO extends BaseDTO{
 
     /**
      * 用户id
@@ -20,28 +20,19 @@ public class UserOrderDTO extends BaseDTO{
     private String userId;
 
     /**
-     * 地址id
+     * 订单id
      */
-    private String addressId;
+    private String orderId;
 
     /**
-     * 订单总积分
+     * 订单状态
      */
-    private Integer totalIntegral;
+    private Integer status;
 
-    /**
-     * 商品id
-     */
-    private String commodityId;
-
-    /**
-     * 商品数量
-     */
-    private Integer commodityCounts;
-
-    public static UserOrder copy(UserOrderDTO dto){
+    public static UserOrder copy(UpdateUserOrderDTO dto){
         UserOrder userOrder = new UserOrder();
         BeanUtils.copyProperties(dto,userOrder);
+        userOrder.setId(dto.getOrderId());
         return userOrder;
     }
 }

@@ -3,6 +3,7 @@ package com.neusoft.mall.user;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
 import com.baomidou.mybatisplus.enums.IdType;
+import com.neusoft.mall.common.base.BaseDO;
 import lombok.Data;
 
 import java.util.Date;
@@ -12,7 +13,7 @@ import java.util.Date;
  */
 @Data
 @TableName("t_user")
-public class User {
+public class User extends BaseDO{
 
     @TableId(type = IdType.UUID)
     private String id;

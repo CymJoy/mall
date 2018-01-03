@@ -35,7 +35,7 @@ public class UserOrderController {
      */
     @PostMapping(value = "/{userId}/order")
     public ResponseEntity<Result<UserOrderDTO>> create(@PathVariable("userId") String userId, @RequestBody UserOrderDTO userOrderDto) {
-        if (ObjectUtils.isEmpty(userOrderDto)) {
+        if (ObjectUtils.isEmpty(userOrderDto) || ObjectUtils.isEmpty(userId)) {
             throw new RestBadRequestException(ExceptionEnumeration.CommonBadRequest);
         }
         this.userOrderService.createUserOrder(userOrderDto);
@@ -49,8 +49,11 @@ public class UserOrderController {
      * @param orderId
      * @return
      */
-    @PutMapping(value = "/{userId}/order/{orderId}")
-    public ResponseEntity<Result<Object>> cancel(@PathVariable("userId") String userId, @PathVariable("orderId") String orderId) throws RestBadRequestException {
+    @DeleteMapping(value = "/{userId}/order/{orderId}")
+    public ResponseEntity<Result<Object>> delete(@PathVariable("userId") String userId, @PathVariable("orderId") String orderId) throws RestBadRequestException {
+        if (VerifyUtil.isEmpty(userId) || VerifyUtil.isEmpty(orderId)){
+            throw new RestBadRequestException(ExceptionEnumeration.CommonBadRequest);
+        }
         this.userOrderService.cancelOrder(userId, orderId);
         return new ResponseEntity(ResultUtil.success(), HttpStatus.OK);
     }
@@ -58,53 +61,28 @@ public class UserOrderController {
     /**
      * 更新订单状态
      *
-     * @param userOrderDto
-     * @param oldStatus
-     * @param newStatus
      * @return
      */
-//    @PostMapping(value = "/{userId}/order")
-    public ResponseEntity<Result<UserOrderDTO>> updateStatus(@PathVariable("oldStatus") Integer oldStatus, @PathVariable("newStatus") Integer newStatus, @RequestBody UserOrderDTO userOrderDto) {
-        if (ObjectUtils.isEmpty(userOrderDto)) {
+    @PutMapping(value = "/{userId}/order")
+    public ResponseEntity<Result<UpdateUserOrderDTO>> updateStatus(@RequestBody UpdateUserOrderDTO updateUserOrderDTO) {
+        if (ObjectUtils.isEmpty(updateUserOrderDTO)) {
             throw new RestBadRequestException(ExceptionEnumeration.CommonBadRequest);
         }
-        this.userOrderService.updateStatus(userOrderDto,oldStatus,newStatus);
-        return new ResponseEntity(ResultUtil.success(userOrderDto), HttpStatus.OK);
+        this.userOrderService.updateStatus(updateUserOrderDTO);
+        return new ResponseEntity(ResultUtil.success(updateUserOrderDTO), HttpStatus.OK);
     }
 
     /**
-     * 查询所有订单
+     * 查询用户所有订单
      *
-     * @param pages 总页数
-     * @param page  当前页数
-     * @param size  大小
      * @param userId  用户id
      * @return
      */
-    public ResponseEntity<Result<UserOrder>> findAllCommodity(PageRequest pageRequest, String userId) {
-        PageResponse<UserOrder> commodity = this.userOrderService.findAllOrder(userId);
+    @GetMapping(value = "/{userId}/order")
+    public ResponseEntity<Result<UserOrder>> findAllUserOrder(PageRequest pageRequest, @PathVariable String userId) {
+        PageResponse<UserOrder> commodity = this.userOrderService.findAllUserOrder(pageRequest, userId);
         if (VerifyUtil.isEmpty(commodity)) {
             throw new RestBadRequestException(ExceptionEnumeration.CommonEmptyResult);
-        }
-        return new ResponseEntity(ResultUtil.success(), HttpStatus.OK);
-    }
-
-    /**
-     * 更新订单库存
-     *
-     * @param status
-     * @param counts
-     * @param commodityId
-     * @return
-     */
-//    @PostMapping(value = "/{userId}/order")
-    public ResponseEntity<Result<UserOrderDTO>> updateCounts(@PathVariable("status") Integer status, @PathVariable("counts") Integer counts, @PathVariable("commodityId") String commodityId) {
-        if (ObjectUtils.isEmpty(commodityId)) {
-            throw new RestBadRequestException(ExceptionEnumeration.CommonBadRequest);
-        }
-        Commodity commodity = this.userOrderService.updateCounts(status,counts,commodityId);
-        if(ObjectUtils.isEmpty(commodity)){
-            throw new RestBadRequestException(ExceptionEnumeration.CommodityIsNotFound);
         }
         return new ResponseEntity(ResultUtil.success(), HttpStatus.OK);
     }
